@@ -1,0 +1,20 @@
+"0","mapgltemp <- mapgl::maplibre("
+"0","  zoom = 12,"
+"0","  center = c(-89.617, 20.967)"
+"0","  ) |> add_image_source("
+"0","    id='temp',"
+"0","    data = temMid,"
+"0","    colors=c(""#2b83ba"", ""#7fbeac"",""#b4e1a7"", ""#ece3a1"", ""#edc486"", ""#de4e31"")) |> "
+"0","  add_raster_layer("
+"0","    id='temp',"
+"0","    source='temp',"
+"0","    raster_opacity=0.8)"
+"2","G1;H1;Errorh in if (terra::has.colors(data)) { : the condition has length > 1
+Error during wrapup: not that many frames on the stack
+Error: no more error handlers available (recursive errors?); invoking 'abort' restart
+g"
+"0","mapgltemp"
+"2","G1;H1;Errorh: object 'mapgltemp' not found
+Error during wrapup: not that many frames on the stack
+Error: no more error handlers available (recursive errors?); invoking 'abort' restart
+g"

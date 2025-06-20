@@ -1,0 +1,33 @@
+{
+    "id": "4E9DA6E9",
+    "path": "~/Documents/Presentaciones/Pre_1.qmd",
+    "project_path": "Pre_1.qmd",
+    "type": "quarto_markdown",
+    "hash": "24806569",
+    "contents": "",
+    "dirty": false,
+    "created": 1750402860678.0,
+    "source_on_save": true,
+    "relative_order": 1,
+    "properties": {
+        "rmdVisualMode": "false",
+        "rmdVisualWrapConfigured": "true",
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "268,3",
+        "scrollLine": "301",
+        "docOutlineVisible": "1",
+        "rmdVisualCollapsedChunks": "",
+        "rmdVisualModeLocation": "2984:5317",
+        "last_setup_crc32": "83353ee1bdda090d"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1750450308,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1750450312293,
+    "read_only": false,
+    "read_only_alternatives": []
+}
