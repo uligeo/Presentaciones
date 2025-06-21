@@ -272,8 +272,8 @@ mapacomparadoveg
 
 ```{r}
 
-a<- mapgl::compare(mapgltemp, m2)
-a
+mapatempcom<- mapgl::compare(mapgltemp, m2)
+mapatempcom
 ```
 
 ------------------------------------------------------------------------
