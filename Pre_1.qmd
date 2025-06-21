@@ -30,7 +30,6 @@ library(viridis)
 library(RColorBrewer)
 library(plotly)
 library(mapgl)
-library(tmap)
 
 # Configuración para gráficas
 theme_set(theme_minimal() +
@@ -54,7 +53,7 @@ theme_set(theme_minimal() +
 
 ## ¿Por qué Mérida necesita datos ambientales? {background-color="#16213e"}
 
-::::: columns
+::: columns
 ::: {.column width="50%"}
 ##### **Mérida 2024: Récords Climáticos**
 
@@ -72,7 +71,7 @@ theme_set(theme_minimal() +
 -   **Lluvias torrenciales** (jun-oct)\
 -   **Cenotes** amenazados por urbanización\
 :::
-:::::
+:::
 
 ------------------------------------------------------------------------
 
@@ -110,14 +109,14 @@ ggplotly(p1) %>%
 
 ## 🌡️ Isla de Calor {background-color="#8b0000"}
 
-::::: columns
+::: columns
 ::: {.column width="50%"}
 ### **Crisis térmica 2024**
 
- **43 °C** récord histórico (mayo)\
-️ **39 °C** promedio máximas (abr-may)\
- **10-12 °C** diferencia centro-norte\
- **Centro Histórico**: zona más caliente
+**43 °C** récord histórico (mayo)\
+️**39 °C** promedio máximas (abr-may)\
+**10-12 °C** diferencia centro-norte\
+**Centro Histórico**: zona más caliente
 :::
 
 ::: {.column width="50%"}
@@ -128,15 +127,13 @@ ggplotly(p1) %>%
 -   **Escasa cobertura arbórea** en el centro\
 -   **Densidad vehicular** alta\
 :::
-:::::
+:::
 
 ## Temperatura superficial 2024
 
-
 ![Temperaturas 2024](Datos/mapa_temperaturas_con_perfiles.png){fig-align="center" width="100%"}
 
----
-
+------------------------------------------------------------------------
 
 ### Mapa interactivo
 
@@ -168,8 +165,7 @@ mapgltemp <- maplibre(
 mapgltemp  
 ```
 
-
----
+------------------------------------------------------------------------
 
 ## Promedios de temperatura
 
@@ -202,7 +198,7 @@ ggplotly(p2) %>%
   layout(plot_bgcolor = 'rgba(0,0,0,0)', paper_bgcolor = 'rgba(0,0,0,0)')
 ```
 
----
+------------------------------------------------------------------------
 
 ### **Tecnologías de Monitoreo**
 
@@ -211,15 +207,15 @@ ggplotly(p2) %>%
 -   **Sensores IoT**: Red ciudadana emergente
 -   **Drones térmicos**: Mapeo de techos calientes
 
----
+------------------------------------------------------------------------
 
-## Vegetación {background-color="#F2EBE3"}
+## Crecimiento y Huella Urbana {background-color="#FDF5E6" auto-animate="true"}
 
-![Vegetacion y cambios](Datos/mapa.png){fig-align="center" width="100%")
----
+![](Datos/mapa.png){fig-align="center"}
 
+------------------------------------------------------------------------
 
-## Vegetacion 2017 - 2024
+## Vegetación 2017 - 2024
 
 ```{r}
 #| include: false
@@ -237,7 +233,6 @@ coloresverdes <- rev(c(
 ))
 
 ```
-
 
 ```{r}
 #| include: false
@@ -268,23 +263,36 @@ m2 <- maplibre(zoom = 9, center = c(-89.617, 20.967)) |>
 mapgl::compare(m1, m2)
 ```
 
----
+------------------------------------------------------------------------
 
+
+## Temperatura y Vegetación {background-color="#2c3e50"}
+
+```{r}
+
+mapgl::compare(mapgltemp, m2)
+
+```
+
+------------------------------------------------------------------------
 
 
 ## 💧 Gestión del Agua: Cenotes y Sostenibilidad {background-color="#2980b9"}
 
-::::: columns
-::: {.column width="50%"}
-### **El Desafío Hídrico**
 
-💧 **100% agua subterránea** para abastecimiento
+```{r}
+agua <- sf::st_read("Datos/open_street_cenotes.gpkg")
 
-🕳️ **3,000+ cenotes** estimados en Yucatán
+cuerposagua <- mapview::mapview(agua)
+```
 
-⚠️ **Intrusión salina** por sobreexplotación
+```{r}
+#| message: false
+#| warning: false
+cuerposagua
+```
+------------------------------------------------------------------------
 
-🏭 **Contaminación** por aguas residuales
 
 ### **🛰️ Monitoreo Tecnológico**
 
@@ -345,7 +353,7 @@ leaflet(cenotes_pozos) %>%
 
 ## 🚗 Movilidad Sostenible: Retos y Oportunidades {background-color="#34495e"}
 
-::::: columns
+::: columns
 ::: {.column width="50%"}
 ### **El Desafío de la Movilidad**
 
@@ -447,13 +455,13 @@ ggplotly(p6) %>%
 -   **Waze**: Datos tráfico colaborativo
 -   **Sensores inteligentes**: Conteo vehículos
 :::
-:::::
+:::
 
 ------------------------------------------------------------------------
 
 ## 🛠️ Herramientas y Datos Disponibles {background-color="#2c3e50"}
 
-:::: columns
+::: columns
 ::: {.column width="50%"}
 ### **🏛️ Fuentes Oficiales**
 
@@ -478,4 +486,6 @@ ggplotly(p6) %>%
 -   **Python**: Machine learning ambiental
 -   \*\*Google
 :::
-::::
+:::
+:::
+:::

@@ -1,0 +1,510 @@
+---
+title: "Datos y MedioAmbiente Urbano"
+author: "Ulises Hoil - @EcoData"
+format:
+  revealjs:
+    theme: dark
+    transition: slide
+    background-transition: fade
+    highlight-style: github
+    code-fold: true
+    code-summary: "Ver código"
+    fig-width: 10
+    fig-height: 6
+    incremental: true
+    footer: "Datos Ambientales Mérida, Yucatán"
+    css: custom.css
+editor: visual
+---
+
+```{r setup}
+#| message: false
+#| warning: false
+#| include: false
+library(tidyverse)
+library(sf)
+library(DT)
+library(kableExtra)
+library(ggplot2)
+library(viridis)
+library(RColorBrewer)
+library(plotly)
+library(mapgl)
+
+# Configuración para gráficas
+theme_set(theme_minimal() +
+  theme(
+    text = element_text(color = "white"),
+    plot.background = element_rect(fill = "transparent", color = NA),
+    panel.background = element_rect(fill = "transparent", color = NA),
+    panel.grid = element_line(color = "rgba(255,255,255,0.1)"),
+    axis.text = element_text(color = "white"),
+    axis.title = element_text(color = "white"),
+    legend.text = element_text(color = "white"),
+    legend.title = element_text(color = "white"),
+    plot.title = element_text(color = "#64ffda", size = 16, face = "bold"),
+    plot.subtitle = element_text(color = "white", size = 12)
+  ))
+```
+
+
+##  {background-color="#1a1a2e" background-image="Datos/Merida.jpg" background-opacity="0.4"}
+
+------------------------------------------------------------------------
+
+## ¿Por qué Mérida necesita datos ambientales? {background-color="#16213e"}
+
+::: columns
+::: {.column width="50%"}
+##### **Mérida 2024: Récords Climáticos**
+
+-   **43 °C** temperatura máxima récord (mayo 2024)\
+-   **10-12 °C** diferencia térmica centro-periferia\
+-   **1.1 millones** hab. Zona Metropolitana\
+-   **3.2 %** crecimiento poblacional anual\
+:::
+
+::: {.column width="50%"}
+##### Problematicas
+
+-   **Efecto isla de calor** intenso\
+-   **Sequías** prolongadas (nov-abril)\
+-   **Lluvias torrenciales** (jun-oct)\
+-   **Cenotes** amenazados por urbanización\
+:::
+:::
+
+------------------------------------------------------------------------
+
+## Crecimiento
+
+
+```{r crecimiento-merida}
+
+# Datos reales de crecimiento poblacional Mérida
+anos <- c(1990, 2000, 2010, 2020, 2024)
+poblacion_zm <- c(523, 705, 897, 1035, 1142) # Miles de habitantes
+poblacion_municipio <- c(400, 542, 777, 892, 973)
+
+datos_poblacion <- data.frame(
+  Año = rep(anos, 2),
+  Tipo = rep(c("Zona Metropolitana", "Municipio Mérida"), each = 5),
+  Poblacion = c(poblacion_zm, poblacion_municipio)
+)
+
+p1 <- ggplot(datos_poblacion, aes(x = Año, y = Poblacion, color = Tipo)) +
+  geom_line(size = 2, alpha = 0.8) +
+  geom_point(size = 4, alpha = 0.8) +
+  scale_color_manual(values = c("Zona Metropolitana" = "#64ffda", "Municipio Mérida" = "#ff6b6b")) +
+  labs(
+    subtitle = "Miles de habitantes",
+    x = "Año", y = "Población (miles)",
+    color = "Área"
+  ) +
+  theme(legend.position = "bottom")
+
+ggplotly(p1) %>%
+  layout(plot_bgcolor = 'rgba(0,0,0,0)', paper_bgcolor = 'rgba(0,0,0,0)')
+```
+
+
+------------------------------------------------------------------------
+
+## 🌡️ Isla de Calor {background-color="#8b0000"}
+
+::: columns
+::: {.column width="50%"}
+### **Crisis térmica 2024**
+
+**43 °C** récord histórico (mayo)\
+️**39 °C** promedio máximas (abr-may)\
+**10-12 °C** diferencia centro-norte\
+**Centro Histórico**: zona más caliente
+:::
+
+::: {.column width="50%"}
+### **Factores de riesgo**
+
+-   **Pavimento**: retiene 60 % más calor\
+-   **Edificios coloniales**: muros gruesos de piedra\
+-   **Escasa cobertura arbórea** en el centro\
+-   **Densidad vehicular** alta\
+:::
+:::
+
+## Temperatura superficial 2024
+
+![Temperaturas 2024](Datos/mapa_temperaturas_con_perfiles.png){fig-align="center" width="100%"}
+
+------------------------------------------------------------------------
+
+### Mapa interactivo
+
+
+```{r setup-temp, message=FALSE, warning=FALSE, include=FALSE}
+library(terra)
+library(mapgl)
+
+# Capa de temperatura media diaria (LST) 2024
+temMid <- rast("Datos/LST_Day_Stats_2024.tif")$LST_Day_Mean
+colores <- c("#2b83ba", "#7fbeac", "#b4e1a7",
+             "#ece3a1", "#edc486", "#de4e31")
+# 3) Cortes (mismo largo que la paleta)
+```
+
+```{r mapa-temperatura, message=FALSE, warning=FALSE}
+mapgltemp <- maplibre(
+  zoom   = 9,
+  center = c(-89.617, 20.967)          # Mérida
+) |>
+  add_image_source(
+    id     = "temp",
+    data   = temMid,
+    colors = colores
+  ) |>
+  add_raster_layer(
+    id             = "temp",
+    source         = "temp",
+    raster_opacity = 0.6)
+mapgltemp  
+```
+
+
+------------------------------------------------------------------------
+
+## Promedios de temperatura
+
+
+```{r temperatura-sectores}
+
+# Datos de temperatura por sectores de Mérida (basados en estudios reales)
+sectores <- data.frame(
+  Sector = c("Centro Histórico", "Norte (Montejo)", "Poniente", "Oriente", 
+             "Sur", "Dzityá", "Cholul", "Conkal"),
+  Temp_Max_C = c(42.5, 38.2, 41.0, 40.8, 39.5, 37.8, 38.5, 37.2),
+  Cobertura_Verde_Pct = c(15, 35, 20, 18, 22, 45, 40, 50),
+  Densidad_Pob = c("Muy Alta", "Alta", "Alta", "Media", "Media", "Baja", "Baja", "Baja")
+)
+
+p2 <- ggplot(sectores, aes(x = Cobertura_Verde_Pct, y = Temp_Max_C, 
+                          color = Densidad_Pob, size = Temp_Max_C)) +
+  geom_point(alpha = 0.8) +
+  geom_text(aes(label = Sector), vjust = -1.2, size = 3, color = "white") +
+  scale_color_manual(values = c("Muy Alta" = "#e74c3c", "Alta" = "#f39c12", 
+                               "Media" = "#f1c40f", "Baja" = "#2ecc71")) +
+  scale_size_continuous(range = c(4, 10)) +
+  labs(
+    title = "Cobertura Verde vs Temperatura",
+    subtitle = "Sectores de Mérida, Yucatán",
+    x = "Cobertura Verde (%)", y = "Temperatura Máxima (°C)",
+    color = "Densidad", size = "Temp (°C)"
+  )
+
+ggplotly(p2) %>%
+  layout(plot_bgcolor = 'rgba(0,0,0,0)', paper_bgcolor = 'rgba(0,0,0,0)')
+```
+
+
+------------------------------------------------------------------------
+
+### **Tecnologías de Monitoreo**
+
+-   **Satélites Landsat**: Temperatura superficial
+-   **Estaciones meteorológicas**: CONAGUA (3 estaciones)
+-   **Sensores IoT**: Red ciudadana emergente
+-   **Drones térmicos**: Mapeo de techos calientes
+
+------------------------------------------------------------------------
+
+## Crecimiento y Huella Urbana {background-color="#FDF5E6" auto-animate="true"}
+
+![](Datos/mapa.png){fig-align="center"}
+
+------------------------------------------------------------------------
+
+## Vegetación 2017 - 2024
+
+
+```{r}
+#| include: false
+
+v2017 <-terra::rast("Datos/2017_mod.tif")
+v2024 <-terra::rast("Datos/2024_mod.tif")
+
+coloresverdes <- rev(c(
+  "#00541B",  # verde muy oscuro
+  "#1B7837",  # verde bosque
+  "#4DAF4A",  # verde medio
+  "#7FBC41",  # verde lima
+  "#B8E186",  # verde paste  
+  "#FFFFFF"  # blanco
+))
+
+```
+
+```{r}
+#| include: false
+
+  
+m1 <- maplibre(zoom = 9, center = c(-89.617, 20.967)) |>
+  add_image_source(
+    id             = "2017",
+    data         = v2017,
+    colors         =coloresverdes ) |>
+  add_raster_layer(
+    id             = "2017",
+    source         = "2017",
+    raster_opacity = 0.5)
+
+m2 <- maplibre(zoom = 9, center = c(-89.617, 20.967)) |>
+  add_image_source(
+    id             = "2024",
+    data         = v2024,
+    colors         = coloresverdes) |>
+  add_raster_layer(
+    id             = "2024",
+    source         = "2024",
+    raster_opacity = 0.5)
+```
+
+```{r}
+mapgl::compare(m1, m2)
+```
+
+
+------------------------------------------------------------------------
+
+
+## Temperatura y Vegetación {background-color="#2c3e50"}
+
+
+```{r}
+
+mapgl::compare(mapgltemp, m2)
+
+```
+
+
+------------------------------------------------------------------------
+
+
+## 💧 Gestión del Agua: Cenotes y Sostenibilidad {background-color="#2980b9"}
+
+
+
+```{r}
+agua <- sf::st_read("Datos/open_street_cenotes.gpkg")
+
+cuerposagua <- mapview::mapview(agua)
+```
+
+```{r}
+#| message: false
+#| warning: false
+cuerposagua
+```
+
+------------------------------------------------------------------------
+
+
+### **🛰️ Monitoreo Tecnológico**
+
+-   **Pozos de monitoreo**: 15 activos CONAGUA
+-   **Sensores nivel freático**: Red IoT emergente
+-   **Imágenes satelitales**: Cambios cenotes
+-   **Drones acuáticos**: Mapeo batimétrico
+
+
+```{r mapa-cenotes}
+#| fig-cap: "Cenotes y Pozos Urbanos Mérida"
+
+library(leaflet)
+
+# Datos cenotes y pozos principales en zona urbana
+cenotes_pozos <- data.frame(
+  nombre = c("Cenote Xlacah", "Cenote San Ignacio", "Pozo Norte 1", "Pozo Centro",
+             "Cenote Sambulá", "Pozo Sur 2", "Pozo Oriente", "Cenote Dzonot Carpio"),
+  lat = c(21.058, 20.978, 20.985, 20.967, 20.945, 20.940, 20.970, 20.920),
+  lng = c(-89.612, -89.630, -89.640, -89.617, -89.625, -89.615, -89.595, -89.605),
+  tipo = c("Cenote", "Cenote", "Pozo", "Pozo", "Cenote", "Pozo", "Pozo", "Cenote"),
+  profundidad_m = c(15, 12, 45, 38, 8, 52, 41, 20),
+  estado = c("Natural", "Urbano", "Activo", "Activo", "Amenazado", "Activo", "Activo", "Natural")
+)
+
+# Crear mapa
+leaflet(cenotes_pozos) %>%
+  addTiles() %>%
+  addCircleMarkers(
+    ~lng, ~lat,
+    color = ~case_when(
+      tipo == "Cenote" & estado == "Natural" ~ "#2ecc71",
+      tipo == "Cenote" & estado != "Natural" ~ "#f39c12", 
+      tipo == "Pozo" ~ "#3498db",
+      TRUE ~ "#e74c3c"
+    ),
+    popup = ~paste("<b>", nombre, "</b><br>",
+                   "Tipo:", tipo, "<br>",
+                   "Profundidad:", profundidad_m, "m<br>",
+                   "Estado:", estado),
+    radius = ~sqrt(profundidad_m),
+    opacity = 0.8
+  ) %>%
+  addLegend("bottomright",
+           colors = c("#2ecc71", "#f39c12", "#3498db"),
+           labels = c("Cenote Natural", "Cenote Urbano", "Pozo Abastecimiento"),
+           title = "Fuentes de Agua") %>%
+  setView(lng = -89.617, lat = 20.967, zoom = 11)
+```
+
+
+### **📊 Datos Críticos**
+
+-   **300 L/hab/día** consumo promedio
+-   **40%** pérdidas en red distribución
+-   **25%** incremento demanda (2019-2024)
+-   **3 plantas** tratamiento aguas residuales
+
+------------------------------------------------------------------------
+
+## 🚗 Movilidad Sostenible: Retos y Oportunidades {background-color="#34495e"}
+
+::: columns
+::: {.column width="50%"}
+### **El Desafío de la Movilidad**
+
+🚗 **85%** viajes en transporte privado
+
+🚌 **Va y Ven**: 180,000 usuarios/día
+
+🚲 **BiciRuta**: 28 km de ciclovías
+
+⏱️ **45 min** tiempo promedio de viaje
+
+### **Impacto Ambiental**
+
+-   **35%** emisiones CO₂ por transporte
+-   **20 μg/m³** PM2.5 promedio anual
+-   **8 días** contingencias 2024
+-   **+28%** parque vehicular (2019-2024)
+
+
+```{r modal-split}
+#| fig-cap: "División Modal Mérida vs Ciudades Sustentables"
+
+# Datos división modal
+ciudades <- data.frame(
+  Ciudad = rep(c("Mérida", "Copenhague", "Medellín", "Bogotá"), each = 4),
+  Modo = rep(c("Auto privado", "Transporte público", "Bicicleta", "Caminata"), 4),
+  Porcentaje = c(
+    # Mérida
+    58, 25, 2, 15,
+    # Copenhague
+    25, 20, 35, 20,
+    # Medellín
+    35, 40, 5, 20,
+    # Bogotá
+    25, 55, 5, 15
+  )
+)
+
+p5 <- ggplot(ciudades, aes(x = Ciudad, y = Porcentaje, fill = Modo)) +
+  geom_bar(stat = "identity", position = "stack", alpha = 0.8) +
+  scale_fill_manual(values = c("Auto privado" = "#e74c3c", "Transporte público" = "#3498db",
+                              "Bicicleta" = "#2ecc71", "Caminata" = "#f39c12")) +
+  labs(
+    title = "División Modal: Mérida vs Ciudades Referencia",
+    subtitle = "% de viajes por modo de transporte",
+    x = "Ciudad", y = "Porcentaje de Viajes (%)",
+    fill = "Modo de Transporte"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(p5) %>%
+  layout(plot_bgcolor = 'rgba(0,0,0,0)', paper_bgcolor = 'rgba(0,0,0,0)')
+```
+
+:::
+
+::: {.column width="50%"}
+### **🚀 Proyectos Transformadores**
+
+-   **Tren Maya**: Terminal en Teya (2024)
+-   **BRT Norte-Sur**: En planeación
+-   **Ampliación BiciRuta**: Meta 50 km
+-   **Electromovilidad**: Autobuses eléctricos piloto
+
+
+```{r rutas-transporte}
+#| fig-cap: "Red de Transporte Público Mérida"
+
+# Datos principales rutas transporte
+rutas_tp <- data.frame(
+  ruta = c("Va y Ven Ruta 1", "Va y Ven Ruta 2", "Periférico", "Centro-Norte",
+           "Oriente-Poniente", "Ruta Maya", "BiciRuta Troncal", "Circuito Colonias"),
+  tipo = c("BRT", "BRT", "Urbano", "Urbano", "Urbano", "Turístico", "Ciclovia", "Urbano"),
+  usuarios_dia = c(45000, 35000, 25000, 18000, 22000, 5000, 2500, 15000),
+  km_longitud = c(22, 18, 35, 15, 20, 12, 28, 25),
+  estado = c("Operando", "Operando", "Operando", "Operando", "Operando", 
+             "Operando", "Operando", "Operando")
+)
+
+# Gráfico rutas
+p6 <- ggplot(rutas_tp, aes(x = km_longitud, y = usuarios_dia, 
+                          color = tipo, size = usuarios_dia)) +
+  geom_point(alpha = 0.8) +
+  geom_text(aes(label = ruta), vjust = -1.2, size = 2.5, color = "white") +
+  scale_color_brewer(type = "qual", palette = "Set2") +
+  scale_size_continuous(range = c(4, 12)) +
+  labs(
+    title = "Eficiencia Rutas de Transporte",
+    subtitle = "Usuarios diarios vs Longitud de ruta",
+    x = "Longitud Ruta (km)", y = "Usuarios por Día",
+    color = "Tipo", size = "Usuarios"
+  )
+
+ggplotly(p6) %>%
+  layout(plot_bgcolor = 'rgba(0,0,0,0)', paper_bgcolor = 'rgba(0,0,0,0)')
+```
+
+
+### **📱 Tecnología para la Movilidad**
+
+-   **App Va y Ven**: Tiempos real
+-   **Google Maps**: Integración rutas
+-   **Waze**: Datos tráfico colaborativo
+-   **Sensores inteligentes**: Conteo vehículos
+:::
+:::
+
+------------------------------------------------------------------------
+
+## 🛠️ Herramientas y Datos Disponibles {background-color="#2c3e50"}
+
+::: columns
+::: {.column width="50%"}
+### **🏛️ Fuentes Oficiales**
+
+-   **CONAGUA**: Datos hidrológicos y meteorológicos
+-   **SEMARNAT Yucatán**: Calidad aire y residuos
+-   **INEGI**: Censos y encuestas urbanas
+-   **Ayuntamiento Mérida**: Datos abiertos
+-   **SEDUMA**: Secretaría Desarrollo Urbano
+
+### **🌐 Plataformas Tecnológicas**
+
+-   **SINAICA**: Sistema Nacional Información Calidad Aire
+-   **Monitor Atmosférico**: Universidad Autónoma Yucatán
+-   **OpenStreetMap**: Mapeo colaborativo Mérida
+-   **NASA FIRMS**: Detección incendios
+-   **Copernicus Climate Data**: Datos climáticos
+
+### **📊 Herramientas de Análisis**
+
+-   **R/RStudio**: Análisis estadístico
+-   **QGIS**: Sistemas información geográfica
+-   **Python**: Machine learning ambiental
+-   \*\*Google
+:::
+:::
+:::
+:::
