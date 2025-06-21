@@ -287,13 +287,38 @@ mapgl::compare(mapgltemp, m2)
 #| include: false
 agua <- sf::st_read("Datos/open_street_cenotes.gpkg")
 
-cuerposagua <- mapview::mapview(agua)
+
+library(sf)
+library(leaflet)          
+library(leaflet.extras)    
+
+bbox <- st_bbox(agua)
+ctr  <- c(lng = mean(bbox[c("xmin","xmax")]),
+          lat = mean(bbox[c("ymin","ymax")]))
+
+agua$popup <- sprintf(
+  "<b>%s</b><br/>Tipo: %s<br/>OSM id: %s",
+  ifelse(is.na(agua$name), "Sin nombre", agua$name),
+  agua$natural, agua$osm_id
+)
+
+
+m <- leaflet(agua) |>
+  addProviderTiles(providers$CartoDB.Voyager) |>
+  setView(lng = ctr["lng"], lat = ctr["lat"], zoom = 7) |>
+  addMarkers(
+    popup  = ~popup,
+    clusterOptions = markerClusterOptions()
+  ) |>
+  addFullscreenControl() |>
+  addScaleBar(position = "bottomleft")
+
 ```
 
 ```{r}
 #| message: false
 #| warning: false
-cuerposagua
+m
 ```
 ------------------------------------------------------------------------
 
