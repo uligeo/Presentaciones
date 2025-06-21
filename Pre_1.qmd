@@ -261,7 +261,8 @@ m2 <- maplibre(zoom = 9, center = c(-89.617, 20.967)) |>
 ```
 
 ```{r}
-mapgl::compare(m1, m2)
+mapacomparadoveg <- mapgl::compare(m1, m2)
+mapacomparadoveg
 ```
 
 
@@ -271,8 +272,8 @@ mapgl::compare(m1, m2)
 
 ```{r}
 
-mapgl::compare(mapgltemp, m2)
-
+a<- mapgl::compare(mapgltemp, m2)
+a
 ```
 
 ------------------------------------------------------------------------
