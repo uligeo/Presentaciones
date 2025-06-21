@@ -443,7 +443,9 @@ cicloviasmap
 
 ------------------------------------------------------------------------
 
-![Ciclovias H3](Datos/densidad_ciclovías.png){width="638"}
+
+## ![Ciclovias H3](Datos/densidad_ciclovías.png){width="638"}
+
 
 ------------------------------------------------------------------------
 
