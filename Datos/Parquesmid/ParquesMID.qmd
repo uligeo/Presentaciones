@@ -1,0 +1,38 @@
+<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+<qgis version="3.30.3-'s-Hertogenbosch">
+  <identifier>sigcatastro.DBO.Predios</identifier>
+  <parentidentifier></parentidentifier>
+  <language>ES</language>
+  <type>dataset</type>
+  <title>sigcatastro.DBO.Predios</title>
+  <abstract>REQUIRED: A brief narrative summary of the data set.
+
+REQUIRED: A summary of the intentions with which the data set was developed.</abstract>
+  <keywords vocabulary="gmd:topicCategory">
+    <keyword>REQUIRED: Common-use word or phrase used to describe the subject of the data set.</keyword>
+  </keywords>
+  <links>
+    <link url="file://" name="SDE Feature Class" type="Local Area Network" format="" description="" size="" mimeType=""/>
+  </links>
+  <dates/>
+  <fees></fees>
+  <constraints type="Acceso">REQUIRED: Restrictions and legal prerequisites for accessing the data set.</constraints>
+  <rights>REQUIRED: Restrictions and legal prerequisites for using the data set after access is granted.</rights>
+  <encoding></encoding>
+  <crs>
+    <spatialrefsys nativeFormat="Wkt">
+      <wkt></wkt>
+      <proj4></proj4>
+      <srsid>0</srsid>
+      <srid>0</srid>
+      <authid></authid>
+      <description></description>
+      <projectionacronym></projectionacronym>
+      <ellipsoidacronym></ellipsoidacronym>
+      <geographicflag>false</geographicflag>
+    </spatialrefsys>
+  </crs>
+  <extent>
+    <spatial maxz="0" maxy="2345570.98492599977180362" dimensions="2" crs="EPSG:4326" minz="0" maxx="242369.70181400000001304" miny="2296453.87838400015607476" minx="214836.79702100000577047"/>
+  </extent>
+</qgis>

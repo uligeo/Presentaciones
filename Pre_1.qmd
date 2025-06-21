@@ -51,9 +51,9 @@ theme_set(theme_minimal() +
 
 ------------------------------------------------------------------------
 
-## ¿Por qué Mérida necesita datos ambientales? {background-color="#16213e"}
+## ¿Datos...? {background-color="#16213e"}
 
-::: columns
+::::: columns
 ::: {.column width="50%"}
 ##### **Mérida 2024: Récords Climáticos**
 
@@ -71,7 +71,7 @@ theme_set(theme_minimal() +
 -   **Lluvias torrenciales** (jun-oct)\
 -   **Cenotes** amenazados por urbanización\
 :::
-:::
+:::::
 
 ------------------------------------------------------------------------
 
@@ -109,7 +109,7 @@ ggplotly(p1) %>%
 
 ## Isla de Calor {background-color="#8b0000"}
 
-::: columns
+::::: columns
 ::: {.column width="50%"}
 ### **Crisis térmica 2024**
 
@@ -127,7 +127,8 @@ ggplotly(p1) %>%
 -   **Escasa cobertura arbórea** en el centro\
 -   **Densidad vehicular** alta\
 :::
-:::
+:::::
+
 ------------------------------------------------------------------------
 
 ## Temperatura superficial 2024
@@ -216,6 +217,10 @@ ggplotly(p2) %>%
 
 ------------------------------------------------------------------------
 
+## ![Variación a lo largo de los años](Datos/NDVI_Merida_2017_2024.png){width="819"}
+
+------------------------------------------------------------------------
+
 ## Vegetación 2017 - 2024
 
 ```{r}
@@ -265,8 +270,7 @@ mapacomparadoveg <- mapgl::compare(m1, m2)
 mapacomparadoveg
 ```
 
-
------------------------------------------------------------------------
+------------------------------------------------------------------------
 
 ## Temperatura y Vegetación {background-color="#2c3e50"}
 
@@ -278,9 +282,7 @@ mapatempcom
 
 ------------------------------------------------------------------------
 
-
-## 💧 Gestión del Agua: Cenotes y Sostenibilidad {background-color="#2980b9"}
-
+## Gestión del Agua {background-color="#2980b9"}
 
 ```{r}
 #| message: false
@@ -321,58 +323,187 @@ m <- leaflet(agua) |>
 #| warning: false
 m
 ```
+
 ------------------------------------------------------------------------
 
+## ![Acceso al agua](Datos/photo_2025-06-20_22-19-27.jpg)
 
-### **🛰️ Monitoreo Tecnológico**
+------------------------------------------------------------------------
+
+## ![Función de Salinidad](Datos/photo_2025-06-20_22-19-23.jpg)
+
+------------------------------------------------------------------------
+
+### **Monitoreo Tecnológico**
 
 -   **Pozos de monitoreo**: 15 activos CONAGUA
 -   **Sensores nivel freático**
 -   **Imágenes satelitales**
 
---------------------------------------------------------------------------
+------------------------------------------------------------------------
 
-### **📊 Datos Críticos**
+### **Datos Críticos**
 
 -   **300 L/hab/día** consumo promedio
 -   **40%** pérdidas en red distribución
 -   **25%** incremento demanda (2019-2024)
--   **3 plantas** tratamiento aguas residuales
+-   **Pocas plantas** de tratamiento de las aguas residuales
 
 ------------------------------------------------------------------------
 
-## 🚗 Movilidad Sostenible: Retos y Oportunidades {background-color="#34495e"}
+## Movilidad {background-color="#34495e"}
+
+### ![Congestionamientos](Datos/CAPTURA.png){width="557"}
+
+------------------------------------------------------------------------
 
 ### **El Desafío de la Movilidad**
 
-🚗 **85%** viajes en transporte privado
+**85%** viajes en transporte privado
 
-🚌 **Va y Ven**: 180,000 usuarios/día
+**Va y Ven**: 180,000 usuarios/día
 
-🚲 **BiciRuta**: 28 km de ciclovías
+**BiciRuta**: 28 km de ciclovías
 
-⏱️ **45 min** tiempo promedio de viaje
-
-### **Impacto Ambiental**
-
--   **35%** emisiones CO₂ por transporte
--   **20 μg/m³** PM2.5 promedio anual
--   **8 días** contingencias 2024
--   **+28%** parque vehicular (2019-2024)
-------------------------------------------------------------------------
-### **🚀 Proyectos Transformadores**
-
--   **Tren Maya**: Terminal en Teya (2024)
--   **BRT Norte-Sur**: En planeación
--   **Ampliación BiciRuta**: Meta 50 km
--   **Electromovilidad**: Autobuses eléctricos piloto
+**45 min** tiempo promedio de viaje
 
 ------------------------------------------------------------------------
 
-### **📱 Tecnología para la Movilidad**
+## Ciclovias
 
--   **App Va y Ven**: Tiempos real
--   **Google Maps**: Integración rutas
--   **Waze**: Datos tráfico colaborativo
--   **Sensores inteligentes**: Conteo vehículos
+```{r}
+#| message: false
+#| warning: false
+#| include: false
+ciclovias <- sf::st_read("Datos/Ciclovias_BISIGET_Merida")
+
+ciclovias$popup <- sprintf(
+  "<b>%s</b><br/>%s",
+  ciclovias$title,
+  gsub("\\\\n", "<br/>", ciclovias$descriptio)
+)
+
+# B) Paleta basada en la columna 'stroke'
+#    Si quieres mapear por otro atributo, cámbialo aquí.
+pal_ciclovia <- colorFactor(
+  palette = unique(ciclovias$stroke),   # toma los hex ya definidos
+  domain   = ciclovias$stroke
+)
+
+# ---------------- 3. Calcular centro/zoom ----------------
+bbox_ciclo <- st_bbox(ciclovias)
+ctr        <- c(
+  lng = mean(bbox_ciclo[c("xmin", "xmax")]),
+  lat = mean(bbox_ciclo[c("ymin", "ymax")])
+)
+
+# ---------------- 4. Mapa base ----------------
+mapa1 <- leaflet(options = leafletOptions(preferCanvas = TRUE)) |>
+  addProviderTiles(providers$CartoDB.Voyager) |>
+  setView(lng = ctr["lng"], lat = ctr["lat"], zoom = 12)
+
+# ---------------- 5. Añadir ciclovías ----------------
+cicloviasmap <- mapa1 |>
+  addPolylines(
+    data      = ciclovias,
+    color     = ~stroke,      # usa el hex de cada registro
+    weight    = 4,
+    opacity   = 0.9,
+    popup     = ~popup,
+    group     = "Ciclovías",
+    label     = ~title        # aparece al pasar el cursor
+  ) |>
+  addLegend(
+    position = "bottomright",
+    pal      = pal_ciclovia,
+    values   = ciclovias$stroke,
+    title    = "Ciclovías",
+    labFormat = labelFormat(
+      transform = function(x) {
+        # muestra el título en la leyenda (uno por color)
+        título <- ciclovias$title[match(x, ciclovias$stroke)]
+        ifelse(is.na(título), x, título)
+      }
+    )
+  )
+
+
+
+
+
+```
+
+```{r}
+#| message: false
+#| warning: false
+# ---------------- 8. Visualizar ----------------
+cicloviasmap
+
+```
+
 ------------------------------------------------------------------------
+
+## 
+
+![Ciclovias H3](Datos/densidad_ciclovías.png)
+
+------------------------------------------------------------------------
+
+## VA Y VEN {background-color="#2c3e50"}
+
+```{r}
+#| message: false
+#| warning: false
+#| include: false
+vayven <- sf::st_read("Datos/Rutas_vayven/rutas.shp")
+
+library(viridisLite)
+
+vayven$popup <- sprintf(
+  "<b>Ruta VayVen:</b> %s<br/><i>fid:</i> %s",
+  vayven$shape_id, vayven$fid
+)
+
+
+pal_vay <- colorFactor(
+  palette = viridis(length(unique(vayven$shape_id)), option = "D"),
+  domain  = vayven$shape_id
+)
+
+
+bbox_v  <- st_bbox(vayven)
+ctr_v   <- c(lng = mean(bbox_v[c("xmin","xmax")]),
+             lat = mean(bbox_v[c("ymin","ymax")]))
+
+VAVEN <- leaflet(options = leafletOptions(preferCanvas = TRUE)) |>
+  addProviderTiles(providers$CartoDB.Voyager) |>
+  setView(lng = ctr_v["lng"], lat = ctr_v["lat"], zoom = 7)
+
+# ───────────────── 3. Agregar la capa VayVen ─────────────────
+VAVENMAP <- VAVEN|>
+  addPolylines(
+    data      = vayven,
+    color     = ~pal_vay(shape_id),   # un color por ruta
+    weight    = 3,
+    opacity   = 0.9,
+    popup     = ~popup,
+    group     = "VayVen"
+  ) 
+
+
+```
+
+```{r}
+#| message: false
+#| warning: false
+VAVENMAP
+
+```
+
+------------------------------------------------------------------------
+
+![Densidad de rutas](Datos/densidad_rutas_va_y_ven.png){width="866" height="649"}
+
+-------------------------------------------------------
+
+## ![Densidad paraderos](Datos/densidad_paradas_vyv.png){width="875"}
