@@ -113,10 +113,10 @@ ggplotly(p1) %>%
 ::: {.column width="50%"}
 ### **Crisis térmica 2024**
 
-**43 °C** récord histórico (mayo)\
-️**39 °C** promedio máximas (abr-may)\
-**10-12 °C** diferencia centro-norte\
-**Centro Histórico**: zona más caliente
+- **43 °C** récord histórico (mayo)\
+- **39 °C** promedio máximas (abr-may)\
+- **10-12 °C** diferencia centro-norte\
+- **Centro Histórico**: zona más caliente
 :::
 
 ::: {.column width="50%"}
@@ -353,7 +353,7 @@ m
 
 ## Movilidad {background-color="#34495e"}
 
-### ![Congestionamientos](Datos/CAPTURA.png){width="557"}
+### ![Congestionamientos](Datos/CAPTURA.png){width="615"}
 
 ------------------------------------------------------------------------
 
@@ -443,9 +443,7 @@ cicloviasmap
 
 ------------------------------------------------------------------------
 
-## 
-
-![Ciclovias H3](Datos/densidad_ciclovías.png)
+![Ciclovias H3](Datos/densidad_ciclovías.png){width="638"}
 
 ------------------------------------------------------------------------
 
@@ -504,6 +502,18 @@ VAVENMAP
 
 ![Densidad de rutas](Datos/densidad_rutas_va_y_ven.png){width="866" height="649"}
 
--------------------------------------------------------
+-----------------------------------------------------------------------
 
 ## ![Densidad paraderos](Datos/densidad_paradas_vyv.png){width="875"}
+
+-----------------------------------------------------------------------
+
+## Gracias !!
+
+
+
+- Ulises Hoil 
+- uliseshoil@icloud.com
+- tel: 9901928240
+
+--------------------------------------------------------------------------
